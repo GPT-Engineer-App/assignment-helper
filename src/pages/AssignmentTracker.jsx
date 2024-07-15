@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import VoiceInput from "@/components/VoiceInput";
 
 const AssignmentTracker = () => {
   const [subject, setSubject] = useState("");
@@ -20,30 +19,10 @@ const AssignmentTracker = () => {
     console.log({ subject, description, dueDate, priority });
   };
 
-  const handleVoiceInput = (transcript) => {
-    // Simple parsing logic for demonstration
-    const lowerTranscript = transcript.toLowerCase();
-    if (lowerTranscript.includes("subject")) {
-      const subjectMatch = lowerTranscript.match(/subject\s+(.+)/);
-      if (subjectMatch) setSubject(subjectMatch[1]);
-    }
-    if (lowerTranscript.includes("description")) {
-      const descriptionMatch = lowerTranscript.match(/description\s+(.+)/);
-      if (descriptionMatch) setDescription(descriptionMatch[1]);
-    }
-    if (lowerTranscript.includes("priority")) {
-      if (lowerTranscript.includes("high")) setPriority("high");
-      else if (lowerTranscript.includes("medium")) setPriority("medium");
-      else if (lowerTranscript.includes("low")) setPriority("low");
-    }
-    // Note: Due date parsing would require more complex logic and is omitted for simplicity
-  };
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Assignment Tracker</h1>
-      <VoiceInput onVoiceInput={handleVoiceInput} />
-      <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="subject">Subject</Label>
           <Input
@@ -73,7 +52,7 @@ const AssignmentTracker = () => {
         </div>
         <div>
           <Label htmlFor="priority">Priority</Label>
-          <Select onValueChange={setPriority} value={priority}>
+          <Select onValueChange={setPriority}>
             <SelectTrigger>
               <SelectValue placeholder="Select priority" />
             </SelectTrigger>
