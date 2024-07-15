@@ -1,12 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+import React from "react";
 export const queryClient = new QueryClient();
 export function SupabaseProvider({ children }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
@@ -20,95 +19,250 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-### event
-
-| name       | type        | format | required |
-|------------|-------------|--------|----------|
-| id         | int8        | number | true     |
-| name       | text        | string | true     |
-| created_at | timestamptz | string | true     |
-| date       | date        | string | true     |
-
-### user_preferences
+### blocked_sites
 
 | name       | type        | format | required |
 |------------|-------------|--------|----------|
 | id         | uuid        | string | true     |
-| user_id    | uuid        | string | true     |
-| background | text        | string | false    |
-| font       | text        | string | false    |
-| layout     | text        | string | false    |
+| user_id    | uuid        | string | false    |
+| url        | text        | string | false    |
+| created_at | timestamptz | string | false    |
+
+### user_preferences
+
+| name             | type        | format | required |
+|------------------|-------------|--------|----------|
+| id               | uuid        | string | true     |
+| user_id          | uuid        | string | true     |
+| preference_name  | text        | string | true     |
+| preference_value | jsonb       | object | false    |
+| created_at       | timestamptz | string | true     |
+| updated_at       | timestamptz | string | true     |
+
+### tasks
+
+| name        | type        | format | required |
+|-------------|-------------|--------|----------|
+| id          | uuid        | string | true     |
+| user_id     | uuid        | string | false    |
+| title       | text        | string | false    |
+| description | text        | string | false    |
+| parent_id   | uuid        | string | false    |
+| created_at  | timestamptz | string | false    |
+| updated_at  | timestamptz | string | false    |
+| color       | text        | string | false    |
+
+### mood_logs
+
+| name        | type        | format  | required |
+|-------------|-------------|---------|----------|
+| id          | uuid        | string  | true     |
+| user_id     | uuid        | string  | false    |
+| mood_score  | int4        | integer | false    |
+| notes       | text        | string  | false    |
+| logged_at   | timestamptz | string  | false    |
+
+### habit_logs
+
+| name         | type        | format | required |
+|--------------|-------------|--------|----------|
+| id           | uuid        | string | true     |
+| habit_id     | uuid        | string | false    |
+| completed_at | timestamptz | string | false    |
+
+### test
+
+| name       | type        | format  | required |
+|------------|-------------|---------|----------|
+| id         | int8        | integer | true     |
+| created_at | timestamptz | string  | true     |
+
+### habits
+
+| name       | type        | format | required |
+|------------|-------------|--------|----------|
+| id         | uuid        | string | true     |
+| user_id    | uuid        | string | false    |
+| name       | text        | string | false    |
+| frequency  | text        | string | false    |
+| created_at | timestamptz | string | false    |
+
+### encouragement_messages
+
+| name     | type   | format | required |
+|----------|--------|--------|----------|
+| id       | uuid   | string | true     |
+| message  | text   | string | false    |
+| category | text   | string | false    |
+
+### user_progress
+
+| name                | type        | format  | required |
+|---------------------|-------------|---------|----------|
+| id                  | uuid        | string  | true     |
+| user_id             | uuid        | string  | false    |
+| points              | int4        | integer | false    |
+| streak              | int4        | integer | false    |
+| last_activity_date  | date        | string  | false    |
+| created_at          | timestamptz | string  | false    |
+| updated_at          | timestamptz | string  | false    |
+
+### users
+
+| name       | type        | format | required |
+|------------|-------------|--------|----------|
+| id         | uuid        | string | true     |
+| email      | text        | string | true     |
 | created_at | timestamptz | string | true     |
-| updated_at | timestamptz | string | true     |
+
+### fidget_usage
+
+| name       | type        | format  | required |
+|------------|-------------|---------|----------|
+| id         | uuid        | string  | true     |
+| user_id    | uuid        | string  | false    |
+| game_name  | text        | string  | false    |
+| duration   | int4        | integer | false    |
+| played_at  | timestamptz | string  | false    |
 
 */
 
-// Hooks for the event table
-export const useEvents = () => useQuery({
-    queryKey: ['events'],
-    queryFn: () => fromSupabase(supabase.from('event').select('*'))
+// Blocked Sites
+export const useBlockedSites = () => useQuery({
+    queryKey: ['blocked_sites'],
+    queryFn: () => fromSupabase(supabase.from('blocked_sites').select('*'))
 });
 
-export const useEvent = (id) => useQuery({
-    queryKey: ['event', id],
-    queryFn: () => fromSupabase(supabase.from('event').select('*').eq('id', id).single())
-});
-
-export const useAddEvent = () => {
+export const useAddBlockedSite = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newEvent) => fromSupabase(supabase.from('event').insert([newEvent])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('events');
-        },
+        mutationFn: (newSite) => fromSupabase(supabase.from('blocked_sites').insert([newSite])),
+        onSuccess: () => queryClient.invalidateQueries(['blocked_sites'])
     });
 };
 
-export const useUpdateEvent = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('event').update(updateData).eq('id', id)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('events');
-        },
-    });
-};
-
-export const useDeleteEvent = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (id) => fromSupabase(supabase.from('event').delete().eq('id', id)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('events');
-        },
-    });
-};
-
-// Hooks for the user_preferences table
+// User Preferences
 export const useUserPreferences = () => useQuery({
-    queryKey: ['userPreferences'],
-    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').single())
+    queryKey: ['user_preferences'],
+    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*'))
 });
 
 export const useUpdateUserPreferences = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updateData) => fromSupabase(supabase.from('user_preferences').upsert(updateData)),
-        onSuccess: () => {
-            queryClient.invalidateQueries('userPreferences');
-        },
+        mutationFn: (updates) => fromSupabase(supabase.from('user_preferences').upsert(updates)),
+        onSuccess: () => queryClient.invalidateQueries(['user_preferences'])
     });
 };
 
-// Add a function to check if the Supabase connection is working
-export const checkSupabaseConnection = async () => {
-    try {
-        const { data, error } = await supabase.from('user_preferences').select('id').limit(1);
-        if (error) throw error;
-        console.log('Supabase connection successful');
-        return true;
-    } catch (error) {
-        console.error('Supabase connection failed:', error.message);
-        return false;
-    }
+// Tasks
+export const useTasks = () => useQuery({
+    queryKey: ['tasks'],
+    queryFn: () => fromSupabase(supabase.from('tasks').select('*'))
+});
+
+export const useAddTask = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newTask) => fromSupabase(supabase.from('tasks').insert([newTask])),
+        onSuccess: () => queryClient.invalidateQueries(['tasks'])
+    });
+};
+
+export const useUpdateTask = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updates) => fromSupabase(supabase.from('tasks').upsert(updates)),
+        onSuccess: () => queryClient.invalidateQueries(['tasks'])
+    });
+};
+
+// Mood Logs
+export const useMoodLogs = () => useQuery({
+    queryKey: ['mood_logs'],
+    queryFn: () => fromSupabase(supabase.from('mood_logs').select('*'))
+});
+
+export const useAddMoodLog = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newLog) => fromSupabase(supabase.from('mood_logs').insert([newLog])),
+        onSuccess: () => queryClient.invalidateQueries(['mood_logs'])
+    });
+};
+
+// Habit Logs
+export const useHabitLogs = () => useQuery({
+    queryKey: ['habit_logs'],
+    queryFn: () => fromSupabase(supabase.from('habit_logs').select('*'))
+});
+
+export const useAddHabitLog = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newLog) => fromSupabase(supabase.from('habit_logs').insert([newLog])),
+        onSuccess: () => queryClient.invalidateQueries(['habit_logs'])
+    });
+};
+
+// Habits
+export const useHabits = () => useQuery({
+    queryKey: ['habits'],
+    queryFn: () => fromSupabase(supabase.from('habits').select('*'))
+});
+
+export const useAddHabit = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newHabit) => fromSupabase(supabase.from('habits').insert([newHabit])),
+        onSuccess: () => queryClient.invalidateQueries(['habits'])
+    });
+};
+
+export const useUpdateHabit = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updates) => fromSupabase(supabase.from('habits').upsert(updates)),
+        onSuccess: () => queryClient.invalidateQueries(['habits'])
+    });
+};
+
+// Encouragement Messages
+export const useEncouragementMessages = () => useQuery({
+    queryKey: ['encouragement_messages'],
+    queryFn: () => fromSupabase(supabase.from('encouragement_messages').select('*'))
+});
+
+// User Progress
+export const useUserProgress = () => useQuery({
+    queryKey: ['user_progress'],
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*'))
+});
+
+export const useUpdateUserProgress = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updates) => fromSupabase(supabase.from('user_progress').upsert(updates)),
+        onSuccess: () => queryClient.invalidateQueries(['user_progress'])
+    });
+};
+
+// Users
+export const useUsers = () => useQuery({
+    queryKey: ['users'],
+    queryFn: () => fromSupabase(supabase.from('users').select('*'))
+});
+
+// Fidget Usage
+export const useFidgetUsage = () => useQuery({
+    queryKey: ['fidget_usage'],
+    queryFn: () => fromSupabase(supabase.from('fidget_usage').select('*'))
+});
+
+export const useAddFidgetUsage = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newUsage) => fromSupabase(supabase.from('fidget_usage').insert([newUsage])),
+        onSuccess: () => queryClient.invalidateQueries(['fidget_usage'])
+    });
 };
