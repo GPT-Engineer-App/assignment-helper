@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { Confetti } from "@/components/ui/confetti";
+import { EncouragingMessage } from "@/components/EncouragingMessage";
 
 const subjectColors = {
   Math: "bg-blue-200",
@@ -21,16 +22,31 @@ const AssignmentTracker = () => {
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
   const [priority, setPriority] = useState("");
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [showEncouragement, setShowEncouragement] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newAssignment = { subject, description, dueDate, priority };
+    const newAssignment = { subject, description, dueDate, priority, completed: false };
     setAssignments([...assignments, newAssignment]);
     // Reset form
     setSubject("");
     setDescription("");
     setDueDate(new Date());
     setPriority("");
+  };
+
+  const handleComplete = (index) => {
+    const updatedAssignments = assignments.map((assignment, i) => 
+      i === index ? { ...assignment, completed: true } : assignment
+    );
+    setAssignments(updatedAssignments);
+    setShowConfetti(true);
+    setShowEncouragement(true);
+    setTimeout(() => {
+      setShowConfetti(false);
+      setShowEncouragement(false);
+    }, 5000);
   };
 
   return (
@@ -91,16 +107,25 @@ const AssignmentTracker = () => {
           {assignments.map((assignment, index) => (
             <div
               key={index}
-              className={`p-4 rounded-md ${subjectColors[assignment.subject] || subjectColors.Other}`}
+              className={`p-4 rounded-md ${subjectColors[assignment.subject] || subjectColors.Other} ${
+                assignment.completed ? 'opacity-50' : ''
+              }`}
             >
               <h3 className="font-semibold">{assignment.subject}</h3>
               <p>{assignment.description}</p>
               <p>Due: {format(assignment.dueDate, "PP")}</p>
               <p>Priority: {assignment.priority}</p>
+              {!assignment.completed && (
+                <Button onClick={() => handleComplete(index)} className="mt-2">
+                  Mark as Completed
+                </Button>
+              )}
             </div>
           ))}
         </div>
       </div>
+      {showConfetti && <Confetti />}
+      {showEncouragement && <EncouragingMessage />}
     </div>
   );
 };
