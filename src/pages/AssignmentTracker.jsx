@@ -7,7 +7,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 
+const subjectColors = {
+  Math: "bg-blue-200",
+  Science: "bg-green-200",
+  History: "bg-yellow-200",
+  Literature: "bg-purple-200",
+  Other: "bg-gray-200",
+};
+
 const AssignmentTracker = () => {
+  const [assignments, setAssignments] = useState([]);
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
@@ -15,8 +24,13 @@ const AssignmentTracker = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Implement assignment submission logic
-    console.log({ subject, description, dueDate, priority });
+    const newAssignment = { subject, description, dueDate, priority };
+    setAssignments([...assignments, newAssignment]);
+    // Reset form
+    setSubject("");
+    setDescription("");
+    setDueDate(new Date());
+    setPriority("");
   };
 
   return (
@@ -25,12 +39,18 @@ const AssignmentTracker = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="subject">Subject</Label>
-          <Input
-            id="subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            required
-          />
+          <Select value={subject} onValueChange={setSubject}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select subject" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(subjectColors).map((subj) => (
+                <SelectItem key={subj} value={subj}>
+                  {subj}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="description">Description</Label>
@@ -52,7 +72,7 @@ const AssignmentTracker = () => {
         </div>
         <div>
           <Label htmlFor="priority">Priority</Label>
-          <Select onValueChange={setPriority}>
+          <Select value={priority} onValueChange={setPriority}>
             <SelectTrigger>
               <SelectValue placeholder="Select priority" />
             </SelectTrigger>
@@ -67,8 +87,19 @@ const AssignmentTracker = () => {
       </form>
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Upcoming Assignments</h2>
-        {/* TODO: Implement calendar view of assignments */}
-        <p>Calendar view will be implemented here</p>
+        <div className="space-y-2">
+          {assignments.map((assignment, index) => (
+            <div
+              key={index}
+              className={`p-4 rounded-md ${subjectColors[assignment.subject] || subjectColors.Other}`}
+            >
+              <h3 className="font-semibold">{assignment.subject}</h3>
+              <p>{assignment.description}</p>
+              <p>Due: {format(assignment.dueDate, "PP")}</p>
+              <p>Priority: {assignment.priority}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
