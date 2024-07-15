@@ -99,3 +99,16 @@ export const useUpdateUserPreferences = () => {
         },
     });
 };
+
+// Add a function to check if the Supabase connection is working
+export const checkSupabaseConnection = async () => {
+    try {
+        const { data, error } = await supabase.from('user_preferences').select('id').limit(1);
+        if (error) throw error;
+        console.log('Supabase connection successful');
+        return true;
+    } catch (error) {
+        console.error('Supabase connection failed:', error.message);
+        return false;
+    }
+};
