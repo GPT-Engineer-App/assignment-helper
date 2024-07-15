@@ -30,15 +30,24 @@ const Index = () => {
     <div className="container mx-auto p-4 text-center">
       <h1 className="text-4xl font-bold mb-6">Assignment Management App</h1>
       <p className="text-xl mb-8">Welcome to your personal assignment and time management assistant!</p>
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link to="/assignments">
-          <Button size="lg" className="w-full md:w-auto">Track Assignments</Button>
+          <Button size="lg" className="w-full">Track Assignments</Button>
         </Link>
         <Link to="/time-management">
-          <Button size="lg" className="w-full md:w-auto">Manage Time</Button>
+          <Button size="lg" className="w-full">Manage Time</Button>
         </Link>
         <Link to="/progress">
-          <Button size="lg" className="w-full md:w-auto">Monitor Progress</Button>
+          <Button size="lg" className="w-full">Monitor Progress</Button>
+        </Link>
+        <Link to="/task-breakdown">
+          <Button size="lg" className="w-full">Visual Task Breakdown</Button>
+        </Link>
+        <Link to="/habits">
+          <Button size="lg" className="w-full">Habit Tracker</Button>
+        </Link>
+        <Link to="/emotional-checkins">
+          <Button size="lg" className="w-full">Emotional Check-ins</Button>
         </Link>
       </div>
 
