@@ -6,17 +6,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import ColorPicker from "../components/ColorPicker";
+import VisualTimer from "../components/VisualTimer";
 
 const AssignmentTracker = () => {
   const [subject, setSubject] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(new Date());
   const [priority, setPriority] = useState("");
+  const [color, setColor] = useState("#000000");
+  const [timerDuration, setTimerDuration] = useState(25 * 60); // 25 minutes in seconds
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // TODO: Implement assignment submission logic
-    console.log({ subject, description, dueDate, priority });
+    console.log({ subject, description, dueDate, priority, color });
   };
 
   return (
@@ -63,12 +67,15 @@ const AssignmentTracker = () => {
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <Label>Color Code</Label>
+          <ColorPicker color={color} onChange={setColor} />
+        </div>
         <Button type="submit">Add Assignment</Button>
       </form>
       <div className="mt-8">
-        <h2 className="text-xl font-semibold mb-2">Upcoming Assignments</h2>
-        {/* TODO: Implement calendar view of assignments */}
-        <p>Calendar view will be implemented here</p>
+        <h2 className="text-xl font-semibold mb-2">Visual Timer</h2>
+        <VisualTimer duration={timerDuration} />
       </div>
     </div>
   );
