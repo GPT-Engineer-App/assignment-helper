@@ -1,24 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const moods = ["😄 Happy", "😊 Content", "😐 Neutral", "😔 Sad", "😠 Angry"];
+const productivityLevels = ["High", "Medium", "Low"];
 
 const EmotionalCheckins = () => {
   const [checkins, setCheckins] = useState([]);
   const [currentMood, setCurrentMood] = useState("");
+  const [currentProductivity, setCurrentProductivity] = useState("");
+
+  useEffect(() => {
+    // Load checkins from local storage
+    const savedCheckins = localStorage.getItem("emotionalCheckins");
+    if (savedCheckins) {
+      setCheckins(JSON.parse(savedCheckins));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save checkins to local storage
+    localStorage.setItem("emotionalCheckins", JSON.stringify(checkins));
+  }, [checkins]);
 
   const addCheckin = () => {
-    if (currentMood) {
+    if (currentMood && currentProductivity) {
       const newCheckin = {
         mood: currentMood,
-        timestamp: new Date().toLocaleString(),
+        productivity: currentProductivity,
+        timestamp: new Date().toISOString(),
       };
       setCheckins([...checkins, newCheckin]);
       setCurrentMood("");
+      setCurrentProductivity("");
     }
+  };
+
+  const getMoodProductivityCorrelation = () => {
+    const correlation = {};
+    checkins.forEach((checkin) => {
+      if (!correlation[checkin.mood]) {
+        correlation[checkin.mood] = { High: 0, Medium: 0, Low: 0 };
+      }
+      correlation[checkin.mood][checkin.productivity]++;
+    });
+    return correlation;
   };
 
   return (
@@ -29,7 +58,7 @@ const EmotionalCheckins = () => {
           <CardTitle>How are you feeling?</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup value={currentMood} onValueChange={setCurrentMood}>
+          <RadioGroup value={currentMood} onValueChange={setCurrentMood} className="mb-4">
             {moods.map((mood) => (
               <div key={mood} className="flex items-center space-x-2">
                 <RadioGroupItem value={mood} id={mood} />
@@ -37,17 +66,55 @@ const EmotionalCheckins = () => {
               </div>
             ))}
           </RadioGroup>
+          <Select value={currentProductivity} onValueChange={setCurrentProductivity}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select productivity level" />
+            </SelectTrigger>
+            <SelectContent>
+              {productivityLevels.map((level) => (
+                <SelectItem key={level} value={level}>
+                  {level}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button onClick={addCheckin} className="mt-4">
-            Log Mood
+            Log Mood and Productivity
           </Button>
         </CardContent>
       </Card>
-      <div className="space-y-4">
-        {checkins.map((checkin, index) => (
+      <Card>
+        <CardHeader>
+          <CardTitle>Mood-Productivity Correlation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(getMoodProductivityCorrelation()).map(([mood, productivity]) => (
+              <Card key={mood}>
+                <CardHeader>
+                  <CardTitle>{mood}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {Object.entries(productivity).map(([level, count]) => (
+                    <div key={level} className="flex justify-between">
+                      <span>{level}:</span>
+                      <span>{count}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <div className="mt-4 space-y-4">
+        <h2 className="text-xl font-semibold">Recent Check-ins</h2>
+        {checkins.slice(-5).reverse().map((checkin, index) => (
           <Card key={index}>
             <CardContent className="p-4">
               <p className="font-semibold">{checkin.mood}</p>
-              <p className="text-sm text-gray-500">{checkin.timestamp}</p>
+              <p>Productivity: {checkin.productivity}</p>
+              <p className="text-sm text-gray-500">{new Date(checkin.timestamp).toLocaleString()}</p>
             </CardContent>
           </Card>
         ))}
