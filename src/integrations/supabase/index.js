@@ -29,6 +29,18 @@ const fromSupabase = async (query) => {
 | created_at | timestamptz | string | true     |
 | date       | date        | string | true     |
 
+### user_preferences
+
+| name       | type        | format | required |
+|------------|-------------|--------|----------|
+| id         | uuid        | string | true     |
+| user_id    | uuid        | string | true     |
+| background | text        | string | false    |
+| font       | text        | string | false    |
+| layout     | text        | string | false    |
+| created_at | timestamptz | string | true     |
+| updated_at | timestamptz | string | true     |
+
 */
 
 // Hooks for the event table
@@ -68,6 +80,22 @@ export const useDeleteEvent = () => {
         mutationFn: (id) => fromSupabase(supabase.from('event').delete().eq('id', id)),
         onSuccess: () => {
             queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+// Hooks for the user_preferences table
+export const useUserPreferences = () => useQuery({
+    queryKey: ['userPreferences'],
+    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').single())
+});
+
+export const useUpdateUserPreferences = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updateData) => fromSupabase(supabase.from('user_preferences').upsert(updateData)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('userPreferences');
         },
     });
 };

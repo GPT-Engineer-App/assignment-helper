@@ -1,46 +1,46 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase';
+import { useUserPreferences, useUpdateUserPreferences } from '@/integrations/supabase';
 
 export const SensoryPreferencesContext = createContext();
 
 export const SensoryPreferencesProvider = ({ children }) => {
-  const [preferences, setPreferences] = useState({
+  const { data: preferences, isLoading, error } = useUserPreferences();
+  const updatePreferencesMutation = useUpdateUserPreferences();
+
+  const [localPreferences, setLocalPreferences] = useState({
     background: 'default',
     font: 'default',
     layout: 'default',
   });
 
   useEffect(() => {
-    fetchPreferences();
-  }, []);
-
-  const fetchPreferences = async () => {
-    const { data, error } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .single();
-
-    if (error) {
-      console.error('Error fetching preferences:', error);
-    } else if (data) {
-      setPreferences(data);
+    if (preferences) {
+      setLocalPreferences(preferences);
     }
-  };
+  }, [preferences]);
 
   const updatePreferences = async (key, value) => {
-    setPreferences((prev) => ({ ...prev, [key]: value }));
+    setLocalPreferences((prev) => ({ ...prev, [key]: value }));
 
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert({ [key]: value }, { onConflict: 'user_id' });
-
-    if (error) {
+    try {
+      await updatePreferencesMutation.mutateAsync({ [key]: value });
+    } catch (error) {
       console.error('Error updating preferences:', error);
+      // Revert local state if update fails
+      setLocalPreferences((prev) => ({ ...prev, [key]: preferences[key] }));
     }
   };
 
   return (
-    <SensoryPreferencesContext.Provider value={{ preferences, updatePreferences }}>
+    <SensoryPreferencesContext.Provider 
+      value={{ 
+        preferences: localPreferences, 
+        updatePreferences, 
+        isLoading, 
+        error 
+      }}
+    >
       {children}
     </SensoryPreferencesContext.Provider>
   );
