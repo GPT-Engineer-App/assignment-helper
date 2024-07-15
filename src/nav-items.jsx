@@ -1,8 +1,9 @@
-import { Home, BookOpen, Clock, BarChart } from "lucide-react";
+import { Home, BookOpen, Clock, BarChart, GitFork } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import AssignmentTracker from "./pages/AssignmentTracker.jsx";
 import TimeManagement from "./pages/TimeManagement.jsx";
 import ProgressMonitoring from "./pages/ProgressMonitoring.jsx";
+import VisualTaskBreakdown from "./pages/VisualTaskBreakdown.jsx";
 
 /**
  * Central place for defining the navigation items. Used for navigation components and routing.
@@ -31,5 +32,11 @@ export const navItems = [
     to: "/progress",
     icon: <BarChart className="h-4 w-4" />,
     page: <ProgressMonitoring />,
+  },
+  {
+    title: "Visual Task Breakdown",
+    to: "/task-breakdown",
+    icon: <GitFork className="h-4 w-4" />,
+    page: <VisualTaskBreakdown />,
   },
 ];
