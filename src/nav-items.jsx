@@ -1,5 +1,8 @@
-import { Home } from "lucide-react";
+import { Home, BookOpen, Clock, BarChart } from "lucide-react";
 import Index from "./pages/Index.jsx";
+import AssignmentTracker from "./pages/AssignmentTracker.jsx";
+import TimeManagement from "./pages/TimeManagement.jsx";
+import ProgressMonitoring from "./pages/ProgressMonitoring.jsx";
 
 /**
  * Central place for defining the navigation items. Used for navigation components and routing.
@@ -10,5 +13,23 @@ export const navItems = [
     to: "/",
     icon: <Home className="h-4 w-4" />,
     page: <Index />,
+  },
+  {
+    title: "Assignment Tracker",
+    to: "/assignments",
+    icon: <BookOpen className="h-4 w-4" />,
+    page: <AssignmentTracker />,
+  },
+  {
+    title: "Time Management",
+    to: "/time-management",
+    icon: <Clock className="h-4 w-4" />,
+    page: <TimeManagement />,
+  },
+  {
+    title: "Progress Monitoring",
+    to: "/progress",
+    icon: <BarChart className="h-4 w-4" />,
+    page: <ProgressMonitoring />,
   },
 ];
