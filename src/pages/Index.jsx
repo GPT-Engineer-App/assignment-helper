@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Mic } from "lucide-react";
-import VoiceCommands from "../components/VoiceCommands";
 
 const Index = () => {
   return (
@@ -18,12 +16,6 @@ const Index = () => {
         <Link to="/progress">
           <Button size="lg" className="w-full md:w-auto">Monitor Progress</Button>
         </Link>
-        <Link to="/task-breakdown">
-          <Button size="lg" className="w-full md:w-auto">Visual Task Breakdown</Button>
-        </Link>
-      </div>
-      <div className="mt-8">
-        <VoiceCommands />
       </div>
     </div>
   );
