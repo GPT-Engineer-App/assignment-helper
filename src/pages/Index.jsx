@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Confetti } from "@/components/ui/confetti";
 import { EncouragingMessage } from "@/components/EncouragingMessage";
 import TicTacToe from "@/components/TicTacToe";
+import RewardSystem from "@/components/RewardSystem";
+import StreakTracker from "@/components/StreakTracker";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +32,7 @@ const Index = () => {
     <div className="container mx-auto p-4 text-center">
       <h1 className="text-4xl font-bold mb-6">Assignment Management App</h1>
       <p className="text-xl mb-8">Welcome to your personal assignment and time management assistant!</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <Link to="/assignments">
           <Button size="lg" className="w-full">Track Assignments</Button>
         </Link>
@@ -51,7 +53,12 @@ const Index = () => {
         </Link>
       </div>
 
-      <div className="mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <RewardSystem />
+        <StreakTracker />
+      </div>
+
+      <div className="mb-8">
         <Button onClick={handleTaskCompletion} className="mb-4">
           Simulate Task Completion
         </Button>
@@ -59,7 +66,7 @@ const Index = () => {
         {showEncouragement && <EncouragingMessage />}
       </div>
 
-      <div className="mt-8">
+      <div>
         <Dialog>
           <DialogTrigger asChild>
             <Button>Take a Break</Button>
