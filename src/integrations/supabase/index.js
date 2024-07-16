@@ -19,7 +19,11 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-// ... (previous code remains unchanged)
+// User Progress
+export const useUserProgress = () => useQuery({
+    queryKey: ['userProgress'],
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').single())
+});
 
 // Leaderboard
 export const useLeaderboard = () => useQuery({
@@ -33,4 +37,4 @@ export const useChallenges = () => useQuery({
     queryFn: () => fromSupabase(supabase.from('challenges').select('*'))
 });
 
-// ... (rest of the previous code remains unchanged)
+// Add more hooks for other functionalities as needed

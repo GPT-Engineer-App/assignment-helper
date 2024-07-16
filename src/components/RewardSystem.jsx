@@ -10,7 +10,7 @@ const RewardSystem = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
-  const earnedBadges = userProgress?.earnedBadges || [];
+  const earnedBadges = userProgress?.earned_badges || [];
 
   return (
     <Card>

@@ -10,7 +10,7 @@ const StreakTracker = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   const streak = userProgress?.streak || 0;
-  const earnedBadges = userProgress?.earnedBadges || [];
+  const earnedBadges = userProgress?.earned_badges || [];
 
   return (
     <Card>
