@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUserProgress } from '@/integrations/supabase';
+import { Badges } from './Badges';
 
 const StreakTracker = () => {
   const { data: userProgress, isLoading, error } = useUserProgress();
@@ -9,6 +10,7 @@ const StreakTracker = () => {
   if (error) return <div>Error: {error.message}</div>;
 
   const streak = userProgress?.streak || 0;
+  const earnedBadges = userProgress?.earned_badges || [];
 
   return (
     <Card>
@@ -29,13 +31,8 @@ const StreakTracker = () => {
             ))}
           </div>
           <div>
-            <p className="font-semibold">Badges:</p>
-            {/* Placeholder for badges. Replace with actual badge components when available */}
-            <div className="flex space-x-2 mt-2">
-              {[...Array(3)].map((_, index) => (
-                <div key={index} className="w-10 h-10 bg-yellow-200 rounded-full"></div>
-              ))}
-            </div>
+            <p className="font-semibold mb-2">Streak Badges:</p>
+            <Badges earnedBadges={earnedBadges} />
           </div>
         </div>
       </CardContent>
