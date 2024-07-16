@@ -1,4 +1,4 @@
-import { Home, BookOpen, Clock, BarChart, GitFork, CheckSquare, Smile, Settings, Focus } from "lucide-react";
+import { Home, BookOpen, Clock, BarChart, GitFork, CheckSquare, Smile, Settings, Focus, Trophy, Award } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import AssignmentTracker from "./pages/AssignmentTracker.jsx";
 import TimeManagement from "./pages/TimeManagement.jsx";
@@ -8,6 +8,8 @@ import HabitTracker from "./pages/HabitTracker.jsx";
 import EmotionalCheckins from "./pages/EmotionalCheckins.jsx";
 import SensoryPreferences from "./components/SensoryPreferences.jsx";
 import FocusModePage from "./pages/FocusModePage.jsx";
+import LeaderboardPage from "./pages/LeaderboardPage.jsx";
+import ChallengesPage from "./pages/ChallengesPage.jsx";
 
 /**
  * Central place for defining the navigation items. Used for navigation components and routing.
@@ -66,5 +68,17 @@ export const navItems = [
     to: "/focus-mode",
     icon: <Focus className="h-4 w-4" />,
     page: <FocusModePage />,
+  },
+  {
+    title: "Leaderboard",
+    to: "/leaderboard",
+    icon: <Trophy className="h-4 w-4" />,
+    page: <LeaderboardPage />,
+  },
+  {
+    title: "Challenges",
+    to: "/challenges",
+    icon: <Award className="h-4 w-4" />,
+    page: <ChallengesPage />,
   },
 ];
