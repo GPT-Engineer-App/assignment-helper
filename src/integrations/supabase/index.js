@@ -17,8 +17,6 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-// ... (previous code remains unchanged)
-
 // User Progress
 export const useUserProgress = () => useQuery({
     queryKey: ['user_progress'],
@@ -33,4 +31,16 @@ export const useUpdateUserProgress = () => {
     });
 };
 
-// ... (rest of the file remains unchanged)
+// User Preferences
+export const useUserPreferences = () => useQuery({
+    queryKey: ['user_preferences'],
+    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').single())
+});
+
+export const useUpdateUserPreferences = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updates) => fromSupabase(supabase.from('user_preferences').upsert(updates)),
+        onSuccess: () => queryClient.invalidateQueries(['user_preferences'])
+    });
+};
