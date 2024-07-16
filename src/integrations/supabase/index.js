@@ -265,3 +265,29 @@ export const useLeaderboard = () => useQuery({
     queryKey: ['leaderboard'],
     queryFn: () => fromSupabase(supabase.from('user_progress').select('*').order('points', { ascending: false }).limit(10)),
 });
+
+// Challenges
+export const useChallenges = () => useQuery({
+    queryKey: ['challenges'],
+    queryFn: () => fromSupabase(supabase.from('challenges').select('*')),
+});
+
+export const useAddChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newChallenge) => fromSupabase(supabase.from('challenges').insert([newChallenge])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('challenges');
+        },
+    });
+};
+
+export const useUpdateChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updatedChallenge) => fromSupabase(supabase.from('challenges').upsert([updatedChallenge])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('challenges');
+        },
+    });
+};
