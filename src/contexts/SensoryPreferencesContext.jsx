@@ -1,11 +1,11 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { useUserPreferences, useUpdateUserPreferences } from '@/integrations/supabase';
+import { useUserPreferences, useUpdateUserPreference } from '@/integrations/supabase';
 
 export const SensoryPreferencesContext = createContext();
 
 export const SensoryPreferencesProvider = ({ children }) => {
   const { data: preferences, isLoading, error } = useUserPreferences();
-  const updatePreferencesMutation = useUpdateUserPreferences();
+  const updatePreferenceMutation = useUpdateUserPreference();
 
   const [localPreferences, setLocalPreferences] = useState({
     background: 'default',
@@ -23,7 +23,7 @@ export const SensoryPreferencesProvider = ({ children }) => {
     setLocalPreferences((prev) => ({ ...prev, [key]: value }));
 
     try {
-      await updatePreferencesMutation.mutateAsync({ [key]: value });
+      await updatePreferenceMutation.mutateAsync({ [key]: value });
     } catch (error) {
       console.error('Error updating preferences:', error);
       // Revert local state if update fails
