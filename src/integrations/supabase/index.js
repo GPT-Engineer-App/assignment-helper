@@ -37,4 +37,21 @@ export const useChallenges = () => useQuery({
     queryFn: () => fromSupabase(supabase.from('challenges').select('*'))
 });
 
+// User Preferences
+export const useUserPreferences = () => useQuery({
+    queryKey: ['userPreferences'],
+    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').single())
+});
+
+// Update User Preference
+export const useUpdateUserPreference = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (updates) => fromSupabase(supabase.from('user_preferences').update(updates).eq('user_id', supabase.auth.user().id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('userPreferences');
+        },
+    });
+};
+
 // Add more hooks for other functionalities as needed
