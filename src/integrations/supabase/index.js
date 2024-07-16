@@ -17,30 +17,55 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-// User Progress
-export const useUserProgress = () => useQuery({
-    queryKey: ['user_progress'],
-    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').single())
-});
+/* supabase integration types
 
-export const useUpdateUserProgress = () => {
+// EXAMPLE TYPES SECTION
+// DO NOT USE TYPESCRIPT
+
+### foos
+
+| name    | type | format | required |
+|---------|------|--------|----------|
+| id      | int8 | number | true     |
+| title   | text | string | true     |
+| date    | date | string | true     |
+
+### bars
+
+| name    | type | format | required |
+|---------|------|--------|----------|
+| id      | int8 | number | true     |
+| foo_id  | int8 | number | true     |  // foreign key to foos
+	
+*/
+
+// Example hook for models
+
+export const useFoo = ()=> useQuery({
+    queryKey: ['foos'],
+    queryFn: fromSupabase(supabase.from('foos')),
+})
+export const useAddFoo = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updates) => fromSupabase(supabase.from('user_progress').upsert(updates)),
-        onSuccess: () => queryClient.invalidateQueries(['user_progress'])
+        mutationFn: (newFoo)=> fromSupabase(supabase.from('foos').insert([{ title: newFoo.title }])),
+        onSuccess: ()=> {
+            queryClient.invalidateQueries('foos');
+        },
     });
 };
 
-// User Preferences
-export const useUserPreferences = () => useQuery({
-    queryKey: ['user_preferences'],
-    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').single())
-});
-
-export const useUpdateUserPreferences = () => {
+export const useBar = ()=> useQuery({
+    queryKey: ['bars'],
+    queryFn: fromSupabase(supabase.from('bars')),
+})
+export const useAddBar = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updates) => fromSupabase(supabase.from('user_preferences').upsert(updates)),
-        onSuccess: () => queryClient.invalidateQueries(['user_preferences'])
+        mutationFn: (newBar)=> fromSupabase(supabase.from('bars').insert([{ foo_id: newBar.foo_id }])),
+        onSuccess: ()=> {
+            queryClient.invalidateQueries('bars');
+        },
     });
 };
+
