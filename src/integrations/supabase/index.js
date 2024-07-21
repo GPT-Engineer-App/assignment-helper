@@ -225,7 +225,7 @@ export const useEncouragementMessages = () => useQuery({
 // User Progress
 export const useUserProgress = () => useQuery({
     queryKey: ['user_progress'],
-    queryFn: () => fromSupabase(supabase.from('user_progress').select('*')),
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').single()),
 });
 
 export const useUpdateUserProgress = () => {

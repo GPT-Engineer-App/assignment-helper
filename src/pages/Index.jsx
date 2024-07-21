@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Confetti } from "@/components/ui/confetti";
 import { EncouragingMessage } from "@/components/EncouragingMessage";
-import TicTacToe from "@/components/TicTacToe";
 import RewardSystem from "@/components/RewardSystem";
 import StreakTracker from "@/components/StreakTracker";
 import Leaderboard from "@/components/Leaderboard";
 import Challenges from "@/components/Challenges";
+import FidgetGames from "@/components/FidgetGames";
 import {
   Dialog,
   DialogContent,
@@ -65,29 +65,16 @@ const Index = () => {
         <Challenges />
       </div>
 
+      <div className="mb-8">
+        <FidgetGames />
+      </div>
+
       <div className="mb-8 text-center">
         <Button onClick={handleTaskCompletion} className="mb-4">
           Simulate Task Completion
         </Button>
         {showConfetti && <Confetti />}
         {showEncouragement && <EncouragingMessage />}
-      </div>
-
-      <div className="text-center">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Take a Break</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Time for a quick break!</DialogTitle>
-              <DialogDescription>
-                Play a quick game of Tic-Tac-Toe to refresh your mind.
-              </DialogDescription>
-            </DialogHeader>
-            <TicTacToe />
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   );
