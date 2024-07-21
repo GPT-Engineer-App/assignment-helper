@@ -19,252 +19,89 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-### blocked_sites
-
-| name       | type                | format | required |
-|------------|---------------------|--------|----------|
-| id         | uuid                | string | true     |
-| user_id    | uuid                | string | false    |
-| url        | text                | string | false    |
-| created_at | timestamp with time zone | string | true     |
-
 ### user_preferences
 
-| name             | type                | format | required |
-|------------------|---------------------|--------|----------|
-| id               | uuid                | string | true     |
-| user_id          | uuid                | string | true     |
-| preference_name  | text                | string | true     |
-| preference_value | jsonb               | object | false    |
-| created_at       | timestamp with time zone | string | true     |
-| updated_at       | timestamp with time zone | string | true     |
-
-### tasks
-
-| name        | type                | format | required |
-|-------------|---------------------|--------|----------|
-| id          | uuid                | string | true     |
-| user_id     | uuid                | string | false    |
-| title       | text                | string | false    |
-| description | text                | string | false    |
-| parent_id   | uuid                | string | false    |
-| created_at  | timestamp with time zone | string | true     |
-| updated_at  | timestamp with time zone | string | true     |
-| color       | text                | string | false    |
-
-### mood_logs
-
-| name       | type                | format | required |
-|------------|---------------------|--------|----------|
-| id         | uuid                | string | true     |
-| user_id    | uuid                | string | false    |
-| mood_score | integer             | number | false    |
-| notes      | text                | string | false    |
-| logged_at  | timestamp with time zone | string | true     |
-
-### habit_logs
-
-| name         | type                | format | required |
-|--------------|---------------------|--------|----------|
-| id           | uuid                | string | true     |
-| habit_id     | uuid                | string | false    |
-| completed_at | timestamp with time zone | string | true     |
-
-### habits
-
-| name       | type                | format | required |
-|------------|---------------------|--------|----------|
-| id         | uuid                | string | true     |
-| user_id    | uuid                | string | false    |
-| name       | text                | string | false    |
-| frequency  | text                | string | false    |
-| created_at | timestamp with time zone | string | true     |
-
-### encouragement_messages
-
-| name     | type | format | required |
-|----------|------|--------|----------|
-| id       | uuid | string | true     |
-| message  | text | string | false    |
-| category | text | string | false    |
+| name             | type                    | format | required |
+|------------------|-------------------------|--------|----------|
+| id               | uuid                    | string | true     |
+| user_id          | uuid                    | string | true     |
+| background       | text                    | string | false    |
+| font             | text                    | string | false    |
+| layout           | text                    | string | false    |
+| created_at       | timestamp with time zone| string | true     |
+| updated_at       | timestamp with time zone| string | true     |
 
 ### user_progress
 
-| name                | type                | format | required |
-|---------------------|---------------------|--------|----------|
-| id                  | uuid                | string | true     |
-| user_id             | uuid                | string | false    |
-| points              | integer             | number | false    |
-| streak              | integer             | number | false    |
-| last_activity_date  | date                | string | false    |
-| created_at          | timestamp with time zone | string | true     |
-| updated_at          | timestamp with time zone | string | true     |
+| name               | type                    | format | required |
+|--------------------|-------------------------|--------|----------|
+| id                 | uuid                    | string | true     |
+| user_id            | uuid                    | string | true     |
+| username           | text                    | string | false    |
+| points             | integer                 | number | false    |
+| streak             | integer                 | number | false    |
+| earned_badges      | text[]                  | array  | false    |
+| last_activity_date | date                    | string | false    |
+| created_at         | timestamp with time zone| string | true     |
+| updated_at         | timestamp with time zone| string | true     |
 
-### users
+### challenges
 
-| name       | type                | format | required |
-|------------|---------------------|--------|----------|
-| id         | uuid                | string | true     |
-| email      | text                | string | true     |
-| created_at | timestamp with time zone | string | true     |
+| name        | type                    | format | required |
+|-------------|-------------------------|--------|----------|
+| id          | uuid                    | string | true     |
+| name        | text                    | string | true     |
+| description | text                    | string | false    |
+| goal        | integer                 | number | true     |
+| unit        | text                    | string | true     |
+| created_at  | timestamp with time zone| string | true     |
+| updated_at  | timestamp with time zone| string | true     |
 
-### fidget_usage
+### user_challenges
 
-| name      | type                | format | required |
-|-----------|---------------------|--------|----------|
-| id        | uuid                | string | true     |
-| user_id   | uuid                | string | false    |
-| game_name | text                | string | false    |
-| duration  | integer             | number | false    |
-| played_at | timestamp with time zone | string | true     |
+| name         | type                    | format | required |
+|--------------|-------------------------|--------|----------|
+| id           | uuid                    | string | true     |
+| user_id      | uuid                    | string | true     |
+| challenge_id | uuid                    | string | true     |
+| progress     | integer                 | number | false    |
+| completed    | boolean                 | boolean| false    |
+| created_at   | timestamp with time zone| string | true     |
+| updated_at   | timestamp with time zone| string | true     |
 
 */
 
-// Blocked Sites
-export const useBlockedSites = () => useQuery({
-    queryKey: ['blocked_sites'],
-    queryFn: () => fromSupabase(supabase.from('blocked_sites').select('*')),
-});
-
-export const useAddBlockedSite = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newSite) => fromSupabase(supabase.from('blocked_sites').insert([newSite])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('blocked_sites');
-        },
-    });
-};
-
 // User Preferences
-export const useUserPreferences = () => useQuery({
-    queryKey: ['user_preferences'],
-    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*')),
+export const useUserPreferences = (userId) => useQuery({
+    queryKey: ['userPreferences', userId],
+    queryFn: () => fromSupabase(supabase.from('user_preferences').select('*').eq('user_id', userId).single()),
 });
 
 export const useUpdateUserPreference = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedPreference) => fromSupabase(supabase.from('user_preferences').upsert([updatedPreference])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('user_preferences');
+        mutationFn: ({ id, ...updates }) => fromSupabase(supabase.from('user_preferences').update(updates).eq('id', id)),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['userPreferences', variables.user_id]);
         },
     });
 };
-
-// Tasks
-export const useTasks = () => useQuery({
-    queryKey: ['tasks'],
-    queryFn: () => fromSupabase(supabase.from('tasks').select('*')),
-});
-
-export const useAddTask = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newTask) => fromSupabase(supabase.from('tasks').insert([newTask])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('tasks');
-        },
-    });
-};
-
-// Mood Logs
-export const useMoodLogs = () => useQuery({
-    queryKey: ['mood_logs'],
-    queryFn: () => fromSupabase(supabase.from('mood_logs').select('*')),
-});
-
-export const useAddMoodLog = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newLog) => fromSupabase(supabase.from('mood_logs').insert([newLog])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('mood_logs');
-        },
-    });
-};
-
-// Habit Logs
-export const useHabitLogs = () => useQuery({
-    queryKey: ['habit_logs'],
-    queryFn: () => fromSupabase(supabase.from('habit_logs').select('*')),
-});
-
-export const useAddHabitLog = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newLog) => fromSupabase(supabase.from('habit_logs').insert([newLog])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('habit_logs');
-        },
-    });
-};
-
-// Habits
-export const useHabits = () => useQuery({
-    queryKey: ['habits'],
-    queryFn: () => fromSupabase(supabase.from('habits').select('*')),
-});
-
-export const useAddHabit = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newHabit) => fromSupabase(supabase.from('habits').insert([newHabit])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('habits');
-        },
-    });
-};
-
-// Encouragement Messages
-export const useEncouragementMessages = () => useQuery({
-    queryKey: ['encouragement_messages'],
-    queryFn: () => fromSupabase(supabase.from('encouragement_messages').select('*')),
-});
 
 // User Progress
-export const useUserProgress = () => useQuery({
-    queryKey: ['user_progress'],
-    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').single()),
+export const useUserProgress = (userId) => useQuery({
+    queryKey: ['userProgress', userId],
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').eq('user_id', userId).single()),
 });
 
 export const useUpdateUserProgress = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedProgress) => fromSupabase(supabase.from('user_progress').upsert([updatedProgress])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('user_progress');
+        mutationFn: ({ id, ...updates }) => fromSupabase(supabase.from('user_progress').update(updates).eq('id', id)),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['userProgress', variables.user_id]);
         },
     });
 };
-
-// Users
-export const useUsers = () => useQuery({
-    queryKey: ['users'],
-    queryFn: () => fromSupabase(supabase.from('users').select('*')),
-});
-
-// Fidget Usage
-export const useFidgetUsage = () => useQuery({
-    queryKey: ['fidget_usage'],
-    queryFn: () => fromSupabase(supabase.from('fidget_usage').select('*')),
-});
-
-export const useAddFidgetUsage = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (newUsage) => fromSupabase(supabase.from('fidget_usage').insert([newUsage])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('fidget_usage');
-        },
-    });
-};
-
-// Leaderboard
-export const useLeaderboard = () => useQuery({
-    queryKey: ['leaderboard'],
-    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').order('points', { ascending: false }).limit(10)),
-});
 
 // Challenges
 export const useChallenges = () => useQuery({
@@ -272,12 +109,17 @@ export const useChallenges = () => useQuery({
     queryFn: () => fromSupabase(supabase.from('challenges').select('*')),
 });
 
-export const useAddChallenge = () => {
+export const useChallenge = (id) => useQuery({
+    queryKey: ['challenge', id],
+    queryFn: () => fromSupabase(supabase.from('challenges').select('*').eq('id', id).single()),
+});
+
+export const useCreateChallenge = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: (newChallenge) => fromSupabase(supabase.from('challenges').insert([newChallenge])),
         onSuccess: () => {
-            queryClient.invalidateQueries('challenges');
+            queryClient.invalidateQueries(['challenges']);
         },
     });
 };
@@ -285,9 +127,68 @@ export const useAddChallenge = () => {
 export const useUpdateChallenge = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (updatedChallenge) => fromSupabase(supabase.from('challenges').upsert([updatedChallenge])),
-        onSuccess: () => {
-            queryClient.invalidateQueries('challenges');
+        mutationFn: ({ id, ...updates }) => fromSupabase(supabase.from('challenges').update(updates).eq('id', id)),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['challenges']);
+            queryClient.invalidateQueries(['challenge', variables.id]);
         },
     });
 };
+
+export const useDeleteChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('challenges').delete().eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries(['challenges']);
+        },
+    });
+};
+
+// User Challenges
+export const useUserChallenges = (userId) => useQuery({
+    queryKey: ['userChallenges', userId],
+    queryFn: () => fromSupabase(supabase.from('user_challenges').select('*').eq('user_id', userId)),
+});
+
+export const useUserChallenge = (id) => useQuery({
+    queryKey: ['userChallenge', id],
+    queryFn: () => fromSupabase(supabase.from('user_challenges').select('*').eq('id', id).single()),
+});
+
+export const useCreateUserChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newUserChallenge) => fromSupabase(supabase.from('user_challenges').insert([newUserChallenge])),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['userChallenges', variables.user_id]);
+        },
+    });
+};
+
+export const useUpdateUserChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, ...updates }) => fromSupabase(supabase.from('user_challenges').update(updates).eq('id', id)),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['userChallenges', variables.user_id]);
+            queryClient.invalidateQueries(['userChallenge', variables.id]);
+        },
+    });
+};
+
+export const useDeleteUserChallenge = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('user_challenges').delete().eq('id', id)),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries(['userChallenges', variables.user_id]);
+        },
+    });
+};
+
+// Leaderboard
+export const useLeaderboard = () => useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').order('points', { ascending: false })),
+});
