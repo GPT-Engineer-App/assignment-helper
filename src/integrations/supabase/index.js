@@ -186,3 +186,9 @@ export const useDeleteUserChallenge = () => {
         },
     });
 };
+
+// Leaderboard
+export const useLeaderboard = () => useQuery({
+    queryKey: ['leaderboard'],
+    queryFn: () => fromSupabase(supabase.from('user_progress').select('*').order('points', { ascending: false })),
+});
