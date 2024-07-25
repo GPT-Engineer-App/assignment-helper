@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase';
 import { useUserPreferences, useUpdateUserPreferences } from '@/integrations/supabase';
 
 export const SensoryPreferencesContext = createContext();
